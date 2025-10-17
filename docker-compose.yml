@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      # Vite's default port is 5173
+      - "5173:5173"
+    volumes:
+      # Mount the client source code for hot-reloading
+      - ./frontend:/app
+      - /app/node_modules
+
+  backend:
+    build: ./backend # This will use server/Dockerfile
+    command: npm start # Override the Dockerfile's CMD to use nodemon
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_USER=jiya
+      - JWT_SECRET='JiyaSaraf#@$11'
+
+      - PGHOST=db
+      - PGUSER=jiya
+      - PGDATABASE=mydb
+      - PGPASSWORD=123123
+      - PGPORT=5432
+
+
+      
+
+      - FRONTEND_URL=http://localhost:5173
+
+#nodemailer
+      
+      
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+
+      - ./backend:/usr/src/app
+
+      - /usr/src/app/node_modules
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=jiya
+      - POSTGRES_PASSWORD=123123
+      - POSTGRES_DB=mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jiya -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
