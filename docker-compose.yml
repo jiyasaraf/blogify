@@ -31,7 +31,7 @@ services:
 
       
 
-      - FRONTEND_URL=http://localhost:5173
+      - FRONTEND_URL=http://frontend.blogify.run.place
 
 #nodemailer
       
